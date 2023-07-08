@@ -10,8 +10,10 @@ import {
   Param,
   Put,
   Delete,
+  Patch,
 } from '@nestjs/common';
 import { CreateDevice } from './dto/create-device.dto';
+import { UpdateDeviceDto } from './dto/update-device.dto';
 
 @Controller('device')
 export class DeviceController {
@@ -45,5 +47,15 @@ export class DeviceController {
   @Delete(':id')
   async deleteDevice(@Param('id') id: string) {
     return this.DeviceService.deleteDevice(+id);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @HttpCode(200)
+  @Patch(':id')
+  async patchUpdateDevice(
+    @Param('id') id: string,
+    @Body() dto: UpdateDeviceDto,
+  ) {
+    return this.DeviceService.patchUpdateDevice(+id, dto);
   }
 }

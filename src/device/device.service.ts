@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { CreateDevice } from './dto/create-device.dto';
 import { SectionEntity } from 'src/section-buttons/section-buttons.entity';
 import { CreateSectionButtonsDto } from './dto/create-section.dro';
+import { UpdateDeviceDto } from './dto/update-device.dto';
 
 @Injectable()
 export class DeviceService {
@@ -63,12 +64,23 @@ export class DeviceService {
     return this.convertDevice(newDevice);
   }
 
+  async patchUpdateDevice(id: number, dto: UpdateDeviceDto) {
+    const device = (await this.byId(id, false)) as DeviceEntity;
+
+    if (dto.host) device.host = dto.host;
+    if (dto.name) device.name = dto.name;
+    if (dto.token) device.token = dto.token;
+
+    const newDevice = await this.DeviceRepository.save(device);
+    return this.convertDevice(newDevice);
+  }
+
   async deleteDevice(id: number) {
     const device = (await this.byId(id, false)) as DeviceEntity;
     return await this.DeviceRepository.delete(device.id);
   }
 
-  async setSectionDevice(sections: CreateSectionButtonsDto[]) {
+  private async setSectionDevice(sections: CreateSectionButtonsDto[]) {
     let newSections: SectionEntity[] | undefined;
     if (sections.length > 0) {
       newSections = await Promise.all(
@@ -82,7 +94,7 @@ export class DeviceService {
     return newSections ? newSections : [];
   }
 
-  async deleteSectionsDevice(sections: SectionEntity[]) {
+  private async deleteSectionsDevice(sections: SectionEntity[]) {
     if (sections.length > 0) {
       await Promise.all(
         sections.map(
@@ -93,7 +105,7 @@ export class DeviceService {
     }
   }
 
-  convertDevice(device: DeviceEntity) {
+  private convertDevice(device: DeviceEntity) {
     const convertSection = device.sections.map((section) => {
       return {
         id: section.id,
