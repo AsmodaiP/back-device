@@ -1,34 +1,23 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  GatewayTimeoutException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ButtonEntity } from './button-device.entity';
 import { Repository } from 'typeorm';
-import { UpdateButtonDto } from './Dto/update-button.dto';
-import { CreateButtonDto } from './Dto/create-button.dto';
+import { HttpService } from '@nestjs/axios';
 import { TypeButtons } from 'src/device/dto/create-section.dro';
+import { catchError, map } from 'rxjs';
+import { AxiosError } from 'axios';
 
 @Injectable()
 export class ButtonDeviceService {
   constructor(
     @InjectRepository(ButtonEntity)
     private readonly buttonRepository: Repository<ButtonEntity>,
+    private readonly HttpService: HttpService,
   ) {}
-
-  //   async byId(id: number) {
-  //     const button = await this.buttonRepository.findOne({ where: { id } });
-
-  //     if (!button) throw new NotFoundException('Кнопка не найдена!');
-  //     return button;
-  //   }
-
-    // async updateButton(id: number, dto: TypeButtons) {
-    //   const button = await this.byId(id);
-
-    //   button.style = dto.style;
-    //   button.title = dto.title;
-    //   button.token = dto.token;
-
-    //   return await this.buttonRepository.save(button);
-    // }
 
   async createButton(button: TypeButtons) {
     const newButton = await this.buttonRepository.create({
@@ -42,15 +31,33 @@ export class ButtonDeviceService {
     return btn;
   }
 
-  //   async deleteButton(id) {
-  //     const button = await this.byId(id);
-  //     return await this.buttonRepository.delete(button);
-  //   }
+  async byId(id: number, relations = false) {
+    const button = await this.buttonRepository.findOne({
+      where: { id },
+      relations: relations ? { row: { section: { device: true } } } : {},
+    });
 
-  //   async getProxyRequest(device_token: string, btn_id: number) {}
+    if (!button) throw new NotFoundException('Кнопка не найдена!');
+    return button;
+  }
 
-  //   async getUrl(token, btn_id) {
-  //     const button = await this.byId(btn_id);
-  //     //getDevice
-  //   }
+  async clickBtn(id: number) {
+    const btn = await this.byId(id, true);
+    const url = this.getUrl(btn);
+
+    return this.HttpService.get(url)
+      .pipe(map((response) => response.data))
+      .pipe(
+        catchError((err: AxiosError) => {
+          throw new GatewayTimeoutException(err.message);
+        }),
+      );
+  }
+
+  getUrl(button: ButtonEntity) {
+    const hostDevice = button.row.section.device.host;
+    const buttonToken = button.token;
+
+    return `http://${hostDevice}/instrumentctrl/vnc/php/sethardkeyaction.php?ID=${buttonToken}`;
+  }
 }
