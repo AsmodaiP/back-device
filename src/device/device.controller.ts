@@ -9,6 +9,7 @@ import {
   Get,
   Param,
   Put,
+  Delete,
 } from '@nestjs/common';
 import { CreateDevice } from './dto/create-device.dto';
 
@@ -38,5 +39,11 @@ export class DeviceController {
   @Put(':id')
   async updateDevice(@Param('id') id: string, @Body() dto: CreateDevice) {
     return this.DeviceService.updateDevice(+id, dto);
+  }
+
+  @HttpCode(200)
+  @Delete(':id')
+  async deleteDevice(@Param('id') id: string) {
+    return this.DeviceService.deleteDevice(+id);
   }
 }

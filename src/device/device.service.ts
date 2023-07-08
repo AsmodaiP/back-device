@@ -63,6 +63,11 @@ export class DeviceService {
     return this.convertDevice(newDevice);
   }
 
+  async deleteDevice(id: number) {
+    const device = (await this.byId(id, false)) as DeviceEntity;
+    return await this.DeviceRepository.delete(device.id);
+  }
+
   async setSectionDevice(sections: CreateSectionButtonsDto[]) {
     let newSections: SectionEntity[] | undefined;
     if (sections.length > 0) {
