@@ -29,6 +29,11 @@ export class DeviceController {
     return this.DeviceService.byId(+id);
   }
 
+  @Get('getByToken/:token')
+  async getByToken(@Param('token') token: string) {
+    return this.DeviceService.getByToken(token);
+  }
+
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
   @Post('create')

@@ -27,6 +27,16 @@ export class DeviceService {
     return convert ? this.convertDevice(device) : device;
   }
 
+  async getByToken(token: string) {
+    const device = await this.DeviceRepository.findOne({
+      where: { token },
+    });
+
+    if (!device)
+      throw new NotFoundException('Прибор по этому ключу не найден!');
+    return { host: device.host, port: device.port };
+  }
+
   async getAll() {
     const devices = await this.DeviceRepository.find({
       relations: { sections: { buttons: { buttons: true } } },
