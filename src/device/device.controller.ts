@@ -34,6 +34,11 @@ export class DeviceController {
     return this.DeviceService.getByToken(+token);
   }
 
+  @Get('getButtons/:host')
+  async getButtons(@Param('host') host: string) {
+    return this.DeviceService.getButtons(host);
+  }
+
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
   @Post('create')

@@ -1,5 +1,9 @@
 import { SectionButtonsService } from './../section-buttons/section-buttons.service';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  GatewayTimeoutException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeviceEntity } from './device.entity';
 import { Repository } from 'typeorm';
@@ -7,6 +11,9 @@ import { CreateDevice } from './dto/create-device.dto';
 import { SectionEntity } from 'src/section-buttons/section-buttons.entity';
 import { CreateSectionButtonsDto } from './dto/create-section.dro';
 import { UpdateDeviceDto } from './dto/update-device.dto';
+import { HttpService } from '@nestjs/axios';
+import { catchError, map } from 'rxjs';
+import { AxiosError } from 'axios';
 
 @Injectable()
 export class DeviceService {
@@ -14,6 +21,7 @@ export class DeviceService {
     @InjectRepository(DeviceEntity)
     private readonly DeviceRepository: Repository<DeviceEntity>,
     private readonly SectionButtonsService: SectionButtonsService,
+    private readonly HttpService: HttpService,
   ) {}
 
   async byId(id: number, convert: boolean = true) {
@@ -31,7 +39,7 @@ export class DeviceService {
     // const device = await this.DeviceRepository.findOne({
     //   where: { token },
     // });
-    const device = await this.byId(token)
+    const device = await this.byId(token);
 
     if (!device)
       throw new NotFoundException('Прибор по этому ключу не найден!');
@@ -81,6 +89,18 @@ export class DeviceService {
 
     const newDevice = await this.DeviceRepository.save(device);
     return this.convertDevice(newDevice);
+  }
+
+  async getButtons(host: string) {
+    const url = `http://${host}/instrumentctrl/vnc/php/gettoolbar.php?mode=vertical`;
+
+    return this.HttpService.get(url)
+      .pipe(map((response) => response.data))
+      .pipe(
+        catchError((err: AxiosError) => {
+          throw new GatewayTimeoutException(err.message);
+        }),
+      );
   }
 
   async deleteDevice(id: number) {
