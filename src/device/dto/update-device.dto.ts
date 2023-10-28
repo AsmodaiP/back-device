@@ -7,10 +7,6 @@ export class UpdateDeviceDto {
   name: string;
 
   @IsOptional()
-  @IsString()
-  token: string;
-
-  @IsOptional()
   @Validate(HasIpConstraint)
   host: string;
 }

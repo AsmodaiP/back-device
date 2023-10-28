@@ -8,9 +8,6 @@ export class DeviceEntity extends Base {
   name: string;
 
   @Column({ nullable: false })
-  token: string;
-
-  @Column({ nullable: false })
   host: string;
 
   @Column({ nullable: false })

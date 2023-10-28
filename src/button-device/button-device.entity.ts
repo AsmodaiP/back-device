@@ -19,7 +19,7 @@ export class ButtonEntity extends Base {
   @Column({ default: true })
   isEmpty: boolean;
 
-  @Column({ unique: true, nullable: false })
+  @Column({ nullable: false })
   token: string;
 
   @ManyToOne(() => RowEntity, (row) => row.buttons, { onDelete: 'CASCADE' })

@@ -15,7 +15,7 @@ import {
 import { CreateDevice } from './dto/create-device.dto';
 import { UpdateDeviceDto } from './dto/update-device.dto';
 
-@Controller('device')
+@Controller('devices')
 export class DeviceController {
   constructor(private readonly DeviceService: DeviceService) {}
 
@@ -31,7 +31,7 @@ export class DeviceController {
 
   @Get('getByToken/:token')
   async getByToken(@Param('token') token: string) {
-    return this.DeviceService.getByToken(token);
+    return this.DeviceService.getByToken(+token);
   }
 
   @UsePipes(new ValidationPipe())

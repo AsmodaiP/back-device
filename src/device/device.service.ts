@@ -27,10 +27,11 @@ export class DeviceService {
     return convert ? this.convertDevice(device) : device;
   }
 
-  async getByToken(token: string) {
-    const device = await this.DeviceRepository.findOne({
-      where: { token },
-    });
+  async getByToken(token: number) {
+    // const device = await this.DeviceRepository.findOne({
+    //   where: { token },
+    // });
+    const device = await this.byId(token)
 
     if (!device)
       throw new NotFoundException('Прибор по этому ключу не найден!');
@@ -51,7 +52,6 @@ export class DeviceService {
       host: dto.host,
       name: dto.name,
       port: dto.port,
-      token: dto.token,
       sections: await this.setSectionDevice(dto.sections),
     });
 
@@ -66,7 +66,6 @@ export class DeviceService {
     device.host = dto.host;
     device.name = dto.name;
     device.port = dto.port;
-    device.token = dto.token;
     device.sections = await this.setSectionDevice(dto.sections);
 
     const newDevice = await this.DeviceRepository.save(device);
@@ -79,7 +78,6 @@ export class DeviceService {
 
     if (dto.host) device.host = dto.host;
     if (dto.name) device.name = dto.name;
-    if (dto.token) device.token = dto.token;
 
     const newDevice = await this.DeviceRepository.save(device);
     return this.convertDevice(newDevice);

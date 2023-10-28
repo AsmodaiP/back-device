@@ -30,9 +30,6 @@ export class CreateDevice {
   @IsString()
   name: string;
 
-  @IsString()
-  token: string;
-
   @Validate(HasIpConstraint)
   host: string;
 
