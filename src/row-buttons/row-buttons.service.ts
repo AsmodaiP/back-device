@@ -14,15 +14,17 @@ export class RowButtonsService {
     private readonly ButtonDeviceService: ButtonDeviceService,
   ) {}
 
-  async createRow(row: TypeButtons[]) {
+  async createRow(row: TypeButtons[], order: number) {
     const buttons: ButtonEntity[] = await Promise.all(
       row.map(
-        async (button) => await this.ButtonDeviceService.createButton(button),
+        async (button, index) =>
+          await this.ButtonDeviceService.createButton(button, index),
       ),
     );
 
     const newRow = await this.RowRepository.create({
       buttons: buttons,
+      order,
     });
 
     return await this.RowRepository.save(newRow);

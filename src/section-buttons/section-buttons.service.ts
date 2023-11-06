@@ -14,15 +14,16 @@ export class SectionButtonsService {
     private readonly RowButtonsService: RowButtonsService,
   ) {}
 
-  async createSection(section: CreateSectionButtonsDto) {
+  async createSection(section: CreateSectionButtonsDto, order: number) {
     const rows: RowEntity[] = await Promise.all(
       section.buttons.map(
-        async (row) => await this.RowButtonsService.createRow(row),
+        async (row, index) => await this.RowButtonsService.createRow(row, index),
       ),
     );
 
     const newSection = await this.SectionRepository.create({
       buttons: rows,
+      order,
     });
 
     return await this.SectionRepository.save(newSection);

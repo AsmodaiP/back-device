@@ -28,6 +28,17 @@ export class DeviceService {
     const device = await this.DeviceRepository.findOne({
       where: { id },
       relations: { sections: { buttons: { buttons: true } } },
+      order: {
+        sections: {
+          order: 'ASC',
+          buttons: {
+            order: 'ASC',
+            buttons: {
+              order: 'ASC',
+            },
+          },
+        },
+      },
     });
 
     if (!device) throw new NotFoundException('Прибор не найден!');
@@ -49,6 +60,17 @@ export class DeviceService {
   async getAll() {
     const devices = await this.DeviceRepository.find({
       relations: { sections: { buttons: { buttons: true } } },
+      order: {
+        sections: {
+          order: 'ASC',
+          buttons: {
+            order: 'ASC',
+            buttons: {
+              order: 'ASC',
+            },
+          },
+        },
+      },
     });
     return devices.length === 0
       ? []
@@ -113,8 +135,8 @@ export class DeviceService {
     if (sections.length > 0) {
       newSections = await Promise.all(
         sections.map(
-          async (section) =>
-            await this.SectionButtonsService.createSection(section),
+          async (section, index) =>
+            await this.SectionButtonsService.createSection(section, index),
         ),
       );
     }

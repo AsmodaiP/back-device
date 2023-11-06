@@ -22,6 +22,9 @@ export class ButtonEntity extends Base {
   @Column({ nullable: false })
   token: string;
 
+  @Column()
+  order: number; 
+
   @ManyToOne(() => RowEntity, (row) => row.buttons, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'id_row' })
   row: RowEntity;

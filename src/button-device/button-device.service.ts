@@ -19,12 +19,13 @@ export class ButtonDeviceService {
     private readonly HttpService: HttpService,
   ) {}
 
-  async createButton(button: TypeButtons) {
+  async createButton(button: TypeButtons, order: number) {
     const newButton = await this.buttonRepository.create({
       title: button?.title ? button.title : '',
       style: button?.style,
       isEmpty: button ? false : true,
       token: button?.token ? button.token : '',
+      order,
     });
 
     const btn = await this.buttonRepository.save(newButton);
