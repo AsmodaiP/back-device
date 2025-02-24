@@ -2,6 +2,9 @@ import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { join } from 'path';
 import { ButtonEntity } from 'src/button-device/button-device.entity';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 export const getPostgresqlConfig = async (
   ConfigService: ConfigService,
@@ -10,9 +13,9 @@ export const getPostgresqlConfig = async (
   synchronize: true, 
   type: 'postgres',
   host: ConfigService.get('POSTGRES_HOST'),
-  database: ConfigService.get('NAME_DATABASE'),
-  port: ConfigService.get('PORT_DATABASE'),
-  username: ConfigService.get('USER_NAME_DATABASE'),
+  database: ConfigService.get('POSTGRES_DB'),
+  port: ConfigService.get('PG_EXT_PORT'),
+  username: ConfigService.get('PG_USER'),
   password: ConfigService.get('POSTGRES_PASSWORD'),
   entities: [ButtonEntity],
   migrations: [join(__dirname, '**', '*.migration.{ts,js}')],

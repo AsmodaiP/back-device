@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    ports:
+      - "${PG_EXT_PORT}:${POSTGRES_PORT}"
+    env_file:
+      - .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+    # app:
+    # build: .
+    # ports:
+    #   - "${APP_EXT_PORT}:${APP_PORT}"
+
+volumes:
+  pgdata:
